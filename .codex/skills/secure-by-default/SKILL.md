@@ -77,6 +77,11 @@ Use simple search to spot high-risk patterns quickly (then confirm with code rea
 
 When reporting, include the exact file/line region and how to exploit (high-level, not step-by-step).
 
+## Resources
+
+- Secret and red-flag scan script: `scripts/scan_redflags.sh`
+- Next.js and React Native checklists: `references/nextjs-security.md`, `references/react-native-security.md`
+
 ## Output Format
 
 Provide:

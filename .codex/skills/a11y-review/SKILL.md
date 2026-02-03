@@ -62,3 +62,8 @@ Provide:
 
 - Do not add new dependencies unless asked.
 - If the repo has an accessibility checklist, follow it.
+
+## Resources
+
+- Web checklist: `references/web-a11y.md`
+- React Native checklist: `references/react-native-a11y.md`

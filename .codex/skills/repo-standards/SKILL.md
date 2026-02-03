@@ -102,6 +102,10 @@ Provide:
 - Suggested Fixes (minimal, aligned to existing standards)
  - “How to Verify” (exact script(s) to run)
 
+## Optional Helpers
+
+- Use `scripts/discover_quality_gates.py` to identify likely lint/typecheck/test commands without guessing.
+
 ## Example Commands (only when asked to run)
 
 ```bash

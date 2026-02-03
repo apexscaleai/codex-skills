@@ -58,6 +58,10 @@ Provide:
 - Consistency Risks (areas likely to drift)
  - “What To Standardize Next” (optional, if drift is systemic)
 
+## Resources
+
+- Heuristic drift scan script: `scripts/scan_style_drift.py`
+
 ## Notes
 
 - Do not refactor UI without a request.

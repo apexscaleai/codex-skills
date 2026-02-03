@@ -1,6 +1,6 @@
-# ApexScaleAI Codex Skills
+# ApexScaleAI Codex & Claude Code Skills
 
-Practical, opinionated skills for shipping production-grade React Native + Next.js apps with high standards for code quality, security, performance, UI/UX, and infrastructure readiness.
+Practical, opinionated agent skills for shipping production-grade React Native + Next.js apps with high standards for code quality, security, performance, UI/UX, modern aesthetics, and infrastructure readiness.
 
 ## What’s Inside
 
@@ -35,6 +35,10 @@ Use repo-standards to review these changes for PR readiness. Run the repo’s li
 ```text
 Use infra-optimization to audit our CI/CD and caching, then propose 5 ROI-ordered improvements with verification and rollback steps.
 ```
+
+## Use In Claude Code
+
+These skills follow the same `SKILL.md`-based “agent skills” structure. If your Claude Code setup supports custom skills, you can install the skill folders from `.codex/skills/` into the location Claude Code expects for skills.
 
 ## Optional: Install Globally
 

@@ -7,7 +7,12 @@ metadata:
 
 # Production Readiness Review
 
-Use this skill to assess release readiness for web and mobile apps with a focus on operational safety. Follow any repo-specific release checklists if present.
+Use this skill to assess release readiness for web and mobile apps with a focus on operational safety.
+
+Key behavior:
+- Prefer repo evidence over generic advice (existing runbooks, CI scripts, infra code).
+- When evidence is missing, mark items as `UNKNOWN` rather than assuming.
+- Produce a crisp “go/no-go” summary: blockers vs risks vs nice-to-haves.
 
 ## Workflow
 
@@ -38,6 +43,26 @@ Use this skill to assess release readiness for web and mobile apps with a focus 
 - Rollback is documented and practical (not theoretical).
 - If migrations exist, confirm a rollback or forward-fix plan exists.
 - Verify incident owner/on-call path exists (even if lightweight).
+
+## Readiness Checklist Template
+
+Use this structure and fill it with `PASS`/`FAIL`/`UNKNOWN` and evidence:
+
+- Deploy:
+  - Web deploy mechanism: PASS/FAIL/UNKNOWN (evidence: file/doc)
+  - Mobile release mechanism: PASS/FAIL/UNKNOWN (evidence: file/doc)
+- Observability:
+  - Web errors + traces: PASS/FAIL/UNKNOWN (evidence)
+  - Mobile crash reporting: PASS/FAIL/UNKNOWN (evidence)
+  - Alerts routed to humans: PASS/FAIL/UNKNOWN (evidence)
+- Safety:
+  - Rollback plan: PASS/FAIL/UNKNOWN (evidence)
+  - Feature flag for risky behavior: PASS/FAIL/UNKNOWN (evidence)
+  - Migration plan (backward compatible): PASS/FAIL/UNKNOWN (evidence)
+- Quality gates:
+  - CI required checks: PASS/FAIL/UNKNOWN (evidence)
+  - Smoke/canary: PASS/FAIL/UNKNOWN (evidence)
+  - Secrets management: PASS/FAIL/UNKNOWN (evidence)
 
 ## Output Format
 

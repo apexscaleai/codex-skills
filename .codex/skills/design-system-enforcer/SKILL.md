@@ -7,7 +7,12 @@ metadata:
 
 # Design System Enforcer
 
-Use this skill to ensure UI changes adhere to the repo's design system, component library, and design tokens.
+Use this skill to keep UI consistent by enforcing the repo’s design system, components, and tokens (web + mobile).
+
+This skill is strongest when it acts like a “diff gate”:
+- New UI should use existing components.
+- New styles should use tokens/theme helpers, not ad hoc values.
+- New patterns should match existing interaction/empty/error/loading conventions.
 
 ## Workflow
 
@@ -33,6 +38,17 @@ Use this skill to ensure UI changes adhere to the repo's design system, componen
 4. Report deviations.
 - Provide exact locations and suggest the canonical component or token.
 
+## Concrete “Don’t Drift” Checks
+
+- Color drift:
+  - flag hex colors and `rgba(...)` in new code when the repo uses tokens
+- Spacing drift:
+  - flag magic numbers for padding/margin when spacing scale exists
+- Typography drift:
+  - flag ad hoc font sizes/weights when typography tokens exist
+- Component drift:
+  - flag hand-rolled buttons/inputs when canonical components exist
+
 ## Output Format
 
 Provide:
@@ -40,6 +56,7 @@ Provide:
 - Deviations (with file references)
 - Suggested Fixes (preferred components/tokens)
 - Consistency Risks (areas likely to drift)
+ - “What To Standardize Next” (optional, if drift is systemic)
 
 ## Notes
 

@@ -7,46 +7,85 @@ metadata:
 
 # Repo Standards
 
-Use this skill to evaluate consistency and quality against the repo's existing standards, without inventing new rules. Prefer to follow the repo's config and scripts.
+Use this skill to make changes that are consistent with the repo's established standards, and to review changes for “PR-ready” quality.
 
 If the repo has a monorepo toolchain (pnpm workspaces, Turborepo), use it rather than running package-level commands ad hoc.
 
-## Workflow
+## Quick Start (When You Need A Tight Answer)
 
-1. Discover "what the repo already enforces".
-- Read `package.json` at the repo root (and any app/package `package.json` in scope).
-- Determine package manager from `packageManager` and lockfiles: `pnpm-lock.yaml`, `yarn.lock`, `package-lock.json`.
-- Identify scripts and conventions from:
-  - `package.json` scripts: `lint`, `format`, `typecheck`, `test`, `build`, `ci`
-  - `pnpm-workspace.yaml` and `turbo.json` (monorepo orchestration)
-  - `commitlint.config.*`, `.husky/`, `lint-staged.config.*`
-  - `eslint.config.*`, `.eslintrc*`, `prettier.config.*`, `.prettierrc*`, `.editorconfig`
-  - `tsconfig*.json` (incl. base configs)
+1. Identify package manager + orchestrator.
+2. Find the repo’s actual quality gates (`lint`, `typecheck`, `test`, `format`, `ci`).
+3. Run the gates (preferred) or do a best-effort static review (fallback).
+4. Report issues with file references + exact commands to reproduce.
 
-2. Infer conventions from existing code (only if config is unclear).
-- Look at 2-3 representative modules similar to the target scope (e.g., existing Next.js routes/components; existing React Native screens/components).
-- Capture conventions that are actually present:
-  - file naming (`kebab-case`, `PascalCase`, `camelCase`)
-  - component naming (exported component names, default vs named exports)
-  - hook naming (`useX`)
-  - folder structure (e.g. `components/`, `features/`, `screens/`, `app/`, `pages/`)
-  - error handling patterns and logging conventions
+## Workflow (Concrete)
 
-3. Run the repo's quality gates when requested (preferred) or simulate them via review (fallback).
-- Preferred: run existing scripts (root or per-package depending on repo practice).
-- Fallback (no running): validate by inspection using the same standards the tooling would enforce.
+1. Discover what the repo enforces (source-of-truth first).
+- Read root `package.json`.
+- Determine package manager:
+  - `package.json:packageManager` if present.
+  - Else lockfile: `pnpm-lock.yaml` > `yarn.lock` > `package-lock.json`.
+- Identify orchestrator:
+  - `turbo.json` and/or `pnpm-workspace.yaml` implies monorepo orchestration.
+  - If neither exists, assume single-package scripts in root `package.json`.
+- Identify “quality gate” scripts:
+  - Look for `lint`, `typecheck`, `test`, `format`, `ci` in `package.json:scripts`.
+  - If a root `ci` exists, prefer that (it usually reflects production gates).
+- Identify tooling config files (read them, don’t guess):
+  - ESLint: `eslint.config.*`, `.eslintrc*`
+  - Prettier: `prettier.config.*`, `.prettierrc*`
+  - TS: `tsconfig*.json`
+  - commitlint: `commitlint.config.*`
+  - editor: `.editorconfig`
+  - pre-commit: `.husky/`, `lint-staged.config.*`
 
-4. Evaluate the target scope for consistency and correctness.
-- Formatting/Prettier compliance (line endings, quotes, imports order if enforced).
-- ESLint rules (React hooks rules, unused vars, exhaustive deps, etc.).
-- TypeScript: unsafe `any`, missing `return` paths, wrong nullability, inferred vs explicit types when the repo expects explicit.
-- Naming and structure: new code should look "native" to the repo.
-- Tests: if similar code has tests, new code should include tests in the same style/location.
-- Monorepo hygiene: avoid cross-package deep imports unless the repo already does them.
+2. Determine the scope you are enforcing.
+- If reviewing a PR: scope is changed files only.
+- If implementing: scope is “new/modified files + touched neighbors” (imports, types, tests).
+- Identify whether changes are web (Next.js), mobile (React Native), or shared packages.
 
-5. Report findings with evidence.
-- Summarize deviations with file references and concrete examples.
-- If scripts exist and were not run, recommend the exact script(s) to run to confirm.
+3. Infer conventions from code (only when configs don’t fully specify).
+- Look at 2-3 existing modules similar to the target area.
+- Record conventions that are clearly consistent in the repo:
+  - file names (`kebab-case` vs `PascalCase`)
+  - exports (default vs named exports)
+  - hooks naming (`useX`)
+  - folders (e.g., `app/` vs `pages/`, `screens/`, `features/`, `components/`)
+  - test placement and naming (`*.test.ts`, `__tests__/`, etc.)
+
+4. Run the repo’s quality gates (preferred).
+- Prefer the highest-level orchestrator the repo uses:
+  - If `turbo.json` exists and there are scripts like `turbo lint` / `turbo typecheck`, use them.
+  - If pnpm workspaces are used, prefer `pnpm -r <script>` or a repo-provided wrapper script.
+- If you cannot run commands (or user didn’t ask), do a best-effort static check, but clearly label it as such.
+
+5. Enforce the “PR-ready” checklist (concrete checks).
+- Formatting:
+  - No mixed quote/spacing style within a file.
+  - No manual alignment whitespace.
+- Lint/TS:
+  - No new lint suppressions unless justified and localized.
+  - No new `any` unless it’s the established repo approach.
+  - No unsafe non-null assertions unless a guard exists.
+- React:
+  - Hooks rules respected; dependencies correct.
+  - No `useEffect` that should be derived state.
+- Next.js:
+  - Server/client boundary respected (no secrets in client bundles, no server-only imports in client components).
+  - Route conventions align with existing usage (`app/` vs `pages/`).
+- React Native:
+  - Avoid inline anonymous components in render paths if it causes re-renders.
+  - Avoid expensive list item renders (FlatList) without memoization if the repo uses it.
+- Tests:
+  - If similar code has tests, add/update tests following the same harness.
+  - If no tests exist, note the gap and propose the minimal test that would catch regressions.
+
+6. Report findings with evidence.
+- Every finding must include:
+  - The file path(s)
+  - Why it violates the repo’s standard (config or observed pattern)
+  - Minimal fix guidance
+  - The command(s) that would fail (if applicable)
 
 ## What to Avoid
 
@@ -61,17 +100,23 @@ Provide:
 - Checks Run (if any)
 - Findings (ordered by severity)
 - Suggested Fixes (minimal, aligned to existing standards)
+ - “How to Verify” (exact script(s) to run)
 
 ## Example Commands (only when asked to run)
 
 ```bash
 # Prefer the repo's actual scripts; these are examples only.
 
-# pnpm
+# pnpm (single package)
 pnpm run lint
 pnpm run format
 pnpm run typecheck
 pnpm run test
+
+# pnpm (workspace/monorepo common patterns)
+pnpm -r run lint
+pnpm -r run typecheck
+pnpm -r run test
 
 # yarn
 yarn lint

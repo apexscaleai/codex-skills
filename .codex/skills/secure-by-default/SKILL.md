@@ -7,7 +7,12 @@ metadata:
 
 # Secure-by-Default
 
-Use this skill to review security posture for React Native and Next.js codebases. Focus on practical, high-signal issues and align with existing repo patterns.
+Use this skill to review and harden a React Native + Next.js codebase with practical, high-signal checks.
+
+Principles:
+- Prefer “deny by default” at trust boundaries (server APIs, server actions, deep links).
+- Every finding must include (1) evidence and (2) a concrete remediation.
+- Don’t demand tooling the repo doesn’t use; but do call out missing guardrails.
 
 ## Workflow
 
@@ -15,7 +20,7 @@ Use this skill to review security posture for React Native and Next.js codebases
 - Next.js: API routes, server actions, middleware, auth flows, data fetching.
 - React Native: network calls, deep links, local storage, push notification handlers.
 
-2. Check common risk areas.
+2. Check common risk areas (prioritize likely, exploitable issues).
 - Auth:
   - session handling, token storage, cookie flags, logout/invalidation
   - authorization checks at every server boundary (not just UI gating)
@@ -55,6 +60,23 @@ Use this skill to review security posture for React Native and Next.js codebases
 - Ensure server-only code is not imported into client bundles (secrets, admin SDKs).
 - Ensure environment variables follow Next.js conventions (`NEXT_PUBLIC_` only for non-secrets).
 
+## Fast Static “Red Flag” Greps (No New Tools)
+
+Use simple search to spot high-risk patterns quickly (then confirm with code reading):
+- Secrets:
+  - `NEXT_PUBLIC_` used for sensitive values
+  - obvious key patterns (`sk_`, `AIza`, `-----BEGIN`, `ghp_`, `xoxb-`)
+- Dangerous APIs:
+  - `eval(`, `new Function(`, `child_process`, `exec(`, `spawn(`
+- Open redirects:
+  - `redirect(` where destination comes from query params without an allowlist
+- SSRF:
+  - server-side `fetch(urlFromUser)` without allowlist/URL parsing
+- RN:
+  - `WebView` with `javaScriptEnabled` and untrusted content without navigation restrictions
+
+When reporting, include the exact file/line region and how to exploit (high-level, not step-by-step).
+
 ## Output Format
 
 Provide:
@@ -62,6 +84,7 @@ Provide:
 - Evidence (file references)
 - Recommended Fixes (minimal, aligned to repo patterns)
 - Follow-up Checks (if tooling or docs are missing)
+ - “Verification” (how to confirm the fix worked, using existing scripts or minimal repro steps)
 
 ## Notes
 
